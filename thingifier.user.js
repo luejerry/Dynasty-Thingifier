@@ -15,137 +15,38 @@
 // @run-at document-end
 // ==/UserScript==
 
-//Initialize DT object
-const DTp = {
-  yourid: 'Not set!',
-  spoilers: false,
-  navbar: false,
-  pagination: false,
-  bbcode: false,
-  quote2quickreply: false,
-  movequickreply: false,
-  magnifier: false,
-  fontsize: 0,
-  mag: {
-    sizeRes: '512',
-    sizeMeasure: 'px',
-    minSizeRes: '512',
-    minSizeMeasure: 'px',
-    zoomFactor: '250',
-    border: '0'
-  },
-  pendtags: false,
-  ver: '1'
-};
-let DT = getItem('DT', DTp), ver = '2.23';
-console.log(DT.ver, ' - ', parseFloat(DT.ver), ' - ', parseInt(DT.ver) < 2.2);
-if (parseFloat(DT.ver) < 2.2) {
-  console.log('Old Thingifier version < 2.2!');
-  DT = {
-    yourid: GM_getValue('youruserid', 'Not set!'),
-    spoilers: GM_getValue('spoilers', false),
-    navbar: GM_getValue('navbar', false),
-    pagination: GM_getValue('pagination', false),
-    bbcode: GM_getValue('bbcode', false),
-    quote2quickreply: GM_getValue('quote2quickreply', false),
-    movequickreply: GM_getValue('movequickreply', false),
-    magnifier: GM_getValue('magnifier', false),
-    fontsize: GM_getValue('fontsize', 0),
-    mag: {
-      sizeRes: GM_getValue('magSizeRes', '512'),
-      sizeMeasure: GM_getValue('magSizeMeasure', 'px'),
-      minSizeRes: GM_getValue('magMinSizeRes', '512'),
-      minSizeMeasure: GM_getValue('magMinSizeMeasure', 'px'),
-      zoomFactor: GM_getValue('magZoomFactor', '250'),
-      border: GM_getValue('magBorder', '0')
-    },
-    pendtags: GM_getValue('pendtags', false),
-    ver: ver
-  };
-  setItem('DT', DT);
-} else {
-  //DT = getItem("DT", DTp);
-}
-if (DT.ver !== ver) {
-  DT.ver = ver;
-}
-
-console.log('DT:', JSON.stringify(DT, null, '    '));
-
-function getItem (key, def) {
-  const out = localStorage.getItem(key);
-  if (out == null) {
-    return def;
-  } else {
-    return JSON.parse(out);
-  }
-}
-function setItem (key, val) {
-  if (typeof val === 'object') {
-    val = JSON.stringify(val);
-  }
-  localStorage.setItem(key, val);
-}
-
-function getId (id) {
-  let out = document.getElementById(id);
-  if (out == null) {
-    out = undefined;
-  }
-  if (typeof out !== 'undefined') {
-    return out;
-  } else {
-    return document.body;
-  }
-}
-function getClass (cl) {
-  return document.getElementsByClassName(cl);
-}
-
-
 (function () {
   'use strict';
-  let pageurl = document.location.toString().replace(/(#.+)/, ''), //Stores page url and removes any anchors from the stored url so we don't get issues with multiple anchors showing up
-    isuserpostsurl = document.location.toString(), //Stores the address variable a second time for use in a different function
-    postids = [], //Initializes a blank array for the postids
-    quote = [], //Initializes blank array for quotes
-    postcount = 0, //Counter to keep track of how many posts are on the current page
-    counter = 0,
-    configmenustate = false, //Init our menu state's variable
-    yourid = DT.yourid, //Set our user id variable
-    fontsize = [3, 'one', 'two', 'three', 'four', 'five'],
-    bbcode_menu = `
-<div id="thingifier-bbcode">
-<div class="thingifier-bbcode-first-row"><input type="button" id="thingifier-bbcode-quote" value="Quote">
-<input type="button" id="thingifier-bbcode-link" value="Link">
-<input type="button" id="thingifier-bbcode-image" value="Image">
-<input type="button" id="thingifier-bbcode-spoiler" value="Spoiler">
-<input type="button" id="thingifier-bbcode-ul" value="List">
-<input type="button" id="thingifier-bbcode-ol" value="Numbered List">
-<input type="button" id="thingifier-bbcode-italics" value="Italics">
-<input type="button" id="thingifier-bbcode-bold" value="Bold">
-</div>
-<div class="thingifier-bbcode-second-row">
-<input type="button" id="thingifier-bbcode-tag" value="Tags">
-<input type="button" id="thingifier-bbcode-hr" value="Horizontal Rule">
-<input type="button" id="thingifier-bbcode-codeblock" value="Code Block">
-<input type="button" id="thingifier-bbcode-h1" value="H1">
-<input type="button" id="thingifier-bbcode-h2" value="H2">
-<input type="button" id="thingifier-bbcode-h3" value="H3">
-<input type="button" id="thingifier-bbcode-h4" value="H4">
-<input type="button" id="thingifier-bbcode-h5" value="H5">
-<input type="button" id="thingifier-bbcode-h6" value="H6">
-</div>
-</div>`, //The html code for our bbcode buttons
-    quickreply;
 
-  init();
+  //Initialize DT object
+  const DTp = {
+    yourid: 'Not set!',
+    spoilers: false,
+    navbar: false,
+    pagination: false,
+    bbcode: false,
+    quote2quickreply: false,
+    movequickreply: false,
+    magnifier: false,
+    fontsize: 0,
+    mag: {
+      sizeRes: '512',
+      sizeMeasure: 'px',
+      minSizeRes: '512',
+      minSizeMeasure: 'px',
+      zoomFactor: '250',
+      border: '0'
+    },
+    pendtags: false,
+    ver: '1'
+  };
+  let DT = getItem('DT', DTp);
+  const ver = '2.23';
 
-  //Initialize Script
-  function init () {
-
-    //Populate Menu
-    $('body').append(`
+  if (DT.ver !== ver) {
+    DT.ver = ver;
+  }
+  const menuHtml = `
 <style>
 #thingifier {
 float: left;
@@ -158,29 +59,17 @@ top: 25%;
 position: fixed;
 }
 #thingifier-options {
-border: 1px solid black;
+border: 1px solid rgba(0, 0, 0, 0.2);
 padding: 8px;
-background: aliceblue;
-border-bottom-right-radius: 6px;
+border-radius: 6px;
 border-left-width: 0;
+background-color: #ffffff;
+box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 #thingifier-options ul { list-style-type: none; margin-left: -4px;}
 #thingifier-options ul > li {  vertical-align: middle; }
 #thingifier ul li input { padding-right: 4px; }
 #thingifier-font-size { width: 96px; }
-#thingifier-toggle-button {
-position: absolute;
-top: 0;
-left: calc(100% - 1px);
-width: 24px;
-height: 24px;
-border: 1px solid black;
-background-color: aliceblue;
-color: red;
-border-top-right-radius: 6px;
-border-bottom-right-radius: 6px;
-border-left-width: 0;
-}
 .spoilers-disabled {
 background: #666 none repeat scroll 0% 0%;
 color: #fff;
@@ -343,7 +232,6 @@ display: inline;
 z-index: 1001;
 }
 .thingifier-icon {
-/*background-image: url(http://dynasty-scans.com//assets/twitter/bootstrap/glyphicons-halflings-2851b489e8c39f8fad44fc10efb99c3e.png);*/
 background-image: url(/assets/twitter/bootstrap/glyphicons-halflings-b4c22a0ed1f42188864f0046f0862ecb.png);
 display: inline-block;
 width: 14px;
@@ -392,7 +280,7 @@ input.btn {
 cursor: pointer !important;
 }
 </style>
-<div id="thingifier">
+<div id="thingifier" style="display:none;">
 <div id="thingifier-options">
 <ul>
 <li><input type="checkbox" id="thingifier-unhide-spoilers"> Unhide spoilers</li>
@@ -409,7 +297,6 @@ cursor: pointer !important;
 <li><input type="button" id="thingifier-clear" value="Clear stored data"></li>
 </ul>
 </div>
-<div id="thingified-toggle"><input type="button" id="thingifier-toggle-button" value="X"></div>
 <i class="thingifier-icon" id="magnifier-submenu-toggle"></i>
 <div id="thingifier-magnifier-menu">
 <h3><i class="thingifier-icon"></i> Magnifier Settings</h3>
@@ -439,8 +326,64 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
 </ul>
 </div>
 </div>
+`;
 
-`);
+  function getItem (key, def) {
+    const out = localStorage.getItem(key);
+    if (out == null) {
+      return def;
+    } else {
+      return JSON.parse(out);
+    }
+  }
+  function setItem (key, val) {
+    if (typeof val === 'object') {
+      val = JSON.stringify(val);
+    }
+    localStorage.setItem(key, val);
+  }
+  const pageurl = document.location.toString().replace(/(#.+)/, ''); //Stores page url and removes any anchors from the stored url so we don't get issues with multiple anchors showing up
+  let isuserpostsurl = document.location.toString(); //Stores the address variable a second time for use in a different function
+  const postids = []; //Initializes a blank array for the postids
+  const quote = []; //Initializes blank array for quotes
+  let postcount = 0; //Counter to keep track of how many posts are on the current page
+  let counter = 0;
+  let configmenustate = false; //Init our menu state's variable
+  const yourid = DT.yourid; //Set our user id variable
+  const fontsize = [3, 'one', 'two', 'three', 'four', 'five'];
+  const bbcode_menu = `
+<div id="thingifier-bbcode">
+<div class="thingifier-bbcode-first-row"><input type="button" id="thingifier-bbcode-quote" value="Quote">
+<input type="button" id="thingifier-bbcode-link" value="Link">
+<input type="button" id="thingifier-bbcode-image" value="Image">
+<input type="button" id="thingifier-bbcode-spoiler" value="Spoiler">
+<input type="button" id="thingifier-bbcode-ul" value="List">
+<input type="button" id="thingifier-bbcode-ol" value="Numbered List">
+<input type="button" id="thingifier-bbcode-italics" value="Italics">
+<input type="button" id="thingifier-bbcode-bold" value="Bold">
+</div>
+<div class="thingifier-bbcode-second-row">
+<input type="button" id="thingifier-bbcode-tag" value="Tags">
+<input type="button" id="thingifier-bbcode-hr" value="Horizontal Rule">
+<input type="button" id="thingifier-bbcode-codeblock" value="Code Block">
+<input type="button" id="thingifier-bbcode-h1" value="H1">
+<input type="button" id="thingifier-bbcode-h2" value="H2">
+<input type="button" id="thingifier-bbcode-h3" value="H3">
+<input type="button" id="thingifier-bbcode-h4" value="H4">
+<input type="button" id="thingifier-bbcode-h5" value="H5">
+<input type="button" id="thingifier-bbcode-h6" value="H6">
+</div>
+</div>`; //The html code for our bbcode buttons
+  let quickreply;
+
+  init();
+
+  //Initialize Script
+  function init () {
+
+    //Populate Menu
+    $('body').append(menuHtml);
+    addMenuEntry();
     //Define menu option handlers (this must happen before loading config)
     setmenuhandlers();
 
@@ -477,6 +420,17 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
     }
   }
 
+  function addMenuEntry () {
+    const dropdown = Array.from(document.getElementsByClassName('dropdown-menu')).pop();
+    const divider = dropdown.getElementsByClassName('divider')[0];
+    const menuEntry = document.createElement('li');
+    const menuLink = document.createElement('a');
+    menuLink.text = 'Thingifier Options';
+    menuLink.id = 'thingifier-toggle-button';
+    menuLink.style.cursor = 'pointer';
+    dropdown.insertBefore(menuEntry, divider).appendChild(menuLink);
+  }
+
   //Set user ID for own posts link
   function setuserid () {
     $('input#useridsubmit').click(function () {
@@ -498,7 +452,7 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
   //Define event handlers for options menu items
   function setmenuhandlers () {
     //Menu close/open
-    $('input#thingifier-toggle-button').click(function () {
+    $('#thingifier-toggle-button').click(function () {
       menuclose('click');
     });
 
@@ -693,7 +647,7 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
       console.log(configmenustate);
       setTimeout(function () {
         if (!configmenustate) { //If it's true collapse the menu
-          $('#thingifier-options').animate({width:'toggle', height:'toggle'}, 0);
+          // $('#thingifier-options').animate({width:'toggle', height:'toggle'}, 0);
           $('#magnifier-submenu-toggle').fadeToggle(0);
           menubutton();
         }
@@ -704,7 +658,8 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
       //Runs when clicking the button
     } else if (sender === 'click') {
       configmenustate = configmenustate ? false : true; //XOR our menu state, can also use ^=
-      $('#thingifier-options').animate({width:'toggle', height:'toggle'}, 350); //Toggle the menu
+      document.getElementById('thingifier').style.display = configmenustate ? 'initial' : 'none';
+      // $('#thingifier-options').animate({width:'toggle', height:'toggle'}, 350); //Toggle the menu
       if ($('#thingifier-magnifier-menu').is( ':visible' )) {
         $('#thingifier-magnifier-menu').fadeToggle(0);
         $('#magnifier-tooltip').fadeToggle(0);
@@ -718,12 +673,6 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
     }
   }
   function menubutton () {
-    //Controls the button's icon
-    if (!configmenustate) {
-      $('#thingifier-toggle-button').val('▶');
-    } else {
-      $('#thingifier-toggle-button').val('◀');
-    }
   }
 
   function bbcode () {
@@ -877,7 +826,7 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
       bbcode_format();
     });
     function bbcode_format () {
-      var tmp = txtbegin + texttmp.replace(/\[BBCODE-HERE\]/, tmp) + txtend;
+      const tmp = txtbegin + texttmp.replace(/\[BBCODE-HERE\]/, tmp) + txtend;
       $('#forum_post_message').val(tmp);
     }
   }
@@ -885,7 +834,7 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
     if (isuserpostsurl.match(/https:\/\/dynasty-scans.com\/forum\/posts\?user_id=\d+/)) {
       isuserpostsurl = isuserpostsurl.replace(/\d+/, ''); //Replaces the user id in the url
     }
-    for (var i = 0; i < postcount; i++){
+    for (let i = 0; i < postcount; i++){
       counter = i;
       let id = postids[i].toString(); //Temporarily store the post id under the key of 'i' into a variable to use in our next bit
       if ($('#thingifier-quote-to-quickreply').is(':checked')) {
