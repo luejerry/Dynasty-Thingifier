@@ -16,105 +16,105 @@
 // ==/UserScript==
 
 //Initialize DT object
-let DTp = {
-    yourid: "Not set!",
-    spoilers: false,
-    navbar: false,
-    pagination: false,
-    bbcode: false,
-    quote2quickreply: false,
-    movequickreply: false,
-    magnifier: false,
-    fontsize: 0,
-    mag: {
-        sizeRes: "512",
-        sizeMeasure: "px",
-        minSizeRes: "512",
-        minSizeMeasure: "px",
-        zoomFactor: "250",
-        border: "0"
-    },
-    pendtags: false,
-    ver: "1"
+const DTp = {
+  yourid: 'Not set!',
+  spoilers: false,
+  navbar: false,
+  pagination: false,
+  bbcode: false,
+  quote2quickreply: false,
+  movequickreply: false,
+  magnifier: false,
+  fontsize: 0,
+  mag: {
+    sizeRes: '512',
+    sizeMeasure: 'px',
+    minSizeRes: '512',
+    minSizeMeasure: 'px',
+    zoomFactor: '250',
+    border: '0'
+  },
+  pendtags: false,
+  ver: '1'
 };
-var DT = getItem("DT", DTp), ver = "2.23";
-console.log(DT.ver, " - ", parseFloat(DT.ver), " - ", parseInt(DT.ver) < 2.2);
+let DT = getItem('DT', DTp), ver = '2.23';
+console.log(DT.ver, ' - ', parseFloat(DT.ver), ' - ', parseInt(DT.ver) < 2.2);
 if (parseFloat(DT.ver) < 2.2) {
-    console.log("Old Thingifier version < 2.2!");
-    DT = {
-        yourid: GM_getValue("youruserid", "Not set!"),
-        spoilers: GM_getValue("spoilers", false),
-        navbar: GM_getValue("navbar", false),
-        pagination: GM_getValue("pagination", false),
-        bbcode: GM_getValue("bbcode", false),
-        quote2quickreply: GM_getValue("quote2quickreply", false),
-        movequickreply: GM_getValue("movequickreply", false),
-        magnifier: GM_getValue("magnifier", false),
-        fontsize: GM_getValue("fontsize", 0),
-        mag: {
-            sizeRes: GM_getValue("magSizeRes", "512"),
-            sizeMeasure: GM_getValue("magSizeMeasure", "px"),
-            minSizeRes: GM_getValue("magMinSizeRes", "512"),
-            minSizeMeasure: GM_getValue("magMinSizeMeasure", "px"),
-            zoomFactor: GM_getValue("magZoomFactor", "250"),
-            border: GM_getValue("magBorder", "0")
-        },
-        pendtags: GM_getValue("pendtags", false),
-        ver: ver
-    };
-    setItem("DT", DT);
+  console.log('Old Thingifier version < 2.2!');
+  DT = {
+    yourid: GM_getValue('youruserid', 'Not set!'),
+    spoilers: GM_getValue('spoilers', false),
+    navbar: GM_getValue('navbar', false),
+    pagination: GM_getValue('pagination', false),
+    bbcode: GM_getValue('bbcode', false),
+    quote2quickreply: GM_getValue('quote2quickreply', false),
+    movequickreply: GM_getValue('movequickreply', false),
+    magnifier: GM_getValue('magnifier', false),
+    fontsize: GM_getValue('fontsize', 0),
+    mag: {
+      sizeRes: GM_getValue('magSizeRes', '512'),
+      sizeMeasure: GM_getValue('magSizeMeasure', 'px'),
+      minSizeRes: GM_getValue('magMinSizeRes', '512'),
+      minSizeMeasure: GM_getValue('magMinSizeMeasure', 'px'),
+      zoomFactor: GM_getValue('magZoomFactor', '250'),
+      border: GM_getValue('magBorder', '0')
+    },
+    pendtags: GM_getValue('pendtags', false),
+    ver: ver
+  };
+  setItem('DT', DT);
 } else {
-    //DT = getItem("DT", DTp);
+  //DT = getItem("DT", DTp);
 }
 if (DT.ver !== ver) {
-    DT.ver = ver;
+  DT.ver = ver;
 }
 
-console.log("DT:", JSON.stringify(DT, null, "    "));
+console.log('DT:', JSON.stringify(DT, null, '    '));
 
-function getItem(key, def) {
-    let out = localStorage.getItem(key);
-    if (out == null) {
-        return def;
-    } else {
-        return JSON.parse(out);
-    }
+function getItem (key, def) {
+  const out = localStorage.getItem(key);
+  if (out == null) {
+    return def;
+  } else {
+    return JSON.parse(out);
+  }
 }
-function setItem(key, val) {
-    if (typeof val === "object") {
-        val = JSON.stringify(val);
-    }
-    localStorage.setItem(key, val);
-}
-
-function getId(id) {
-    let out = document.getElementById(id);
-    if (out == null) {
-        out = undefined;
-    }
-    if (typeof out !== "undefined") {
-        return out;
-    } else {
-        return document.body;
-    }
-}
-function getClass(cl) {
-    return document.getElementsByClassName(cl);
+function setItem (key, val) {
+  if (typeof val === 'object') {
+    val = JSON.stringify(val);
+  }
+  localStorage.setItem(key, val);
 }
 
+function getId (id) {
+  let out = document.getElementById(id);
+  if (out == null) {
+    out = undefined;
+  }
+  if (typeof out !== 'undefined') {
+    return out;
+  } else {
+    return document.body;
+  }
+}
+function getClass (cl) {
+  return document.getElementsByClassName(cl);
+}
 
-(function() {
-    "use strict";
-    var pageurl = document.location.toString().replace(/(#.+)/, ""), //Stores page url and removes any anchors from the stored url so we don't get issues with multiple anchors showing up
-        isuserpostsurl = document.location.toString(), //Stores the address variable a second time for use in a different function
-        postids = [], //Initializes a blank array for the postids
-        quote = [], //Initializes blank array for quotes
-        postcount = 0, //Counter to keep track of how many posts are on the current page
-        counter = 0,
-        configmenustate = false, //Init our menu state's variable
-        yourid = DT.yourid, //Set our user id variable
-        fontsize = [3, "one", "two", "three", "four", "five"],
-        bbcode_menu = `
+
+(function () {
+  'use strict';
+  let pageurl = document.location.toString().replace(/(#.+)/, ''), //Stores page url and removes any anchors from the stored url so we don't get issues with multiple anchors showing up
+    isuserpostsurl = document.location.toString(), //Stores the address variable a second time for use in a different function
+    postids = [], //Initializes a blank array for the postids
+    quote = [], //Initializes blank array for quotes
+    postcount = 0, //Counter to keep track of how many posts are on the current page
+    counter = 0,
+    configmenustate = false, //Init our menu state's variable
+    yourid = DT.yourid, //Set our user id variable
+    fontsize = [3, 'one', 'two', 'three', 'four', 'five'],
+    bbcode_menu = `
 <div id="thingifier-bbcode">
 <div class="thingifier-bbcode-first-row"><input type="button" id="thingifier-bbcode-quote" value="Quote">
 <input type="button" id="thingifier-bbcode-link" value="Link">
@@ -137,15 +137,15 @@ function getClass(cl) {
 <input type="button" id="thingifier-bbcode-h6" value="H6">
 </div>
 </div>`, //The html code for our bbcode buttons
-        quickreply;
+    quickreply;
 
-    init();
+  init();
 
-    //Initialize Script
-    function init() {
+  //Initialize Script
+  function init () {
 
-        //Populate Menu
-        $('body').append(`
+    //Populate Menu
+    $('body').append(`
 <style>
 #thingifier {
 float: left;
@@ -441,818 +441,817 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
 </div>
 
 `);
-        //Define menu option handlers (this must happen before loading config)
-        setmenuhandlers();
-
-        //Load our config
-        configload();
-
-        //Setup own posts link stuff
-        $('#useridinput').hide();
-        $('#useridsubmit').hide();
-        if (DT.yourid == "Not set!") {
-            $('#thingifier-ownposts').hide();
-            $('#useridinput').show();
-            $('#useridsubmit').show();
-            setuserid();
-        }
-
-        //Check we're viewing a thread
-        if (pageurl.match(/forum\/topics/)) {
-            $('.forum_post').each(function() {
-                postids.push(this.id); //For each element of the class forum_post push the element's id to our postids array
-            });
-            $('.time').each(function(i, obj) {
-                postcount++; //This is where we actually count how many posts are on the page
-            });
-
-            //Retrieve your user id
-            if (DT.yourid.match(/\d+/)) {
-                if (!DT.yourid.match(/dynasty-scans/) && DT.yourid !== "Not set!"){
-                    DT.yourid = `//dynasty-scans.com/forum/posts?user_id=${DT.yourid}`;
-                }
-            } else {
-                DT.yourid = "Not set!";
-            }
-        }
-    }
-
-    //Set user ID for own posts link
-    function setuserid() {
-        $('input#useridsubmit').click(function () {
-            if($("input#useridinput").val().match(/^\d+$/)) {
-                DT.yourid = $('input#useridinput').val();
-                $('#useridinput').hide();
-                $('#useridsubmit').hide();
-                $('#thingifier-ownposts').show();
-                $('#thingifier-ownposts').attr('href', "//dynasty-scans.com/forum/posts?user_id=" + DT.yourid);
-            } else {
-                DT.yourid = "Not set!";
-                $("input#useridinput").val();
-                $('input#useridinput').val("Invalid user id!");
-            }
-            setItem("DT", DT);
-        });
-    }
-
-    //Define event handlers for options menu items
-    function setmenuhandlers() {
-        //Menu close/open
-        $('input#thingifier-toggle-button').click(function() {
-            menuclose("click");
-        });
-    
-        //Unhide spoilers option
-        $('#thingifier-unhide-spoilers').change(function() {
-            DT.spoilers = $(this).is(":checked");
-            setItem("DT", DT);
-            if (DT.spoilers) {
-                $('.spoilers').addClass('spoilers-disabled');
-            } else {
-                $('.spoilers').removeClass('spoilers-disabled');
-            }
-        });
-    
-        //Fixed navbar option
-        $('#thingifier-fixed-navbar').change(function() {
-            DT.navbar = $(this).is(":checked");
-            setItem("DT", DT);
-            console.log("Navbar option clicked " + DT.navbar);
-            if (DT.navbar) {
-                $('.navbar').addClass('navbar-fixed');
-                $('div.forum_post').css("padding-top", 40);
-                $("<div class=\"nav-padding\"></div>").insertAfter(".navbar");
-            } else {
-                $('.navbar').removeClass('navbar-fixed');
-                $('div.forum_post').css("padding-top", 0);
-                $('div.nav-padding').remove();
-            }
-        });
-    
-        //Pagination option
-        $('#thingifier-pagination').change(function() {
-            DT.pagination = $(this).is(":checked");
-            setItem("DT", DT);
-            if (DT.pagination) {
-                $("div.pagination").wrap('<div class=\"tmp\">').parent().html();
-                var tmp = $('div.tmp').html();
-                $("div.pagination").unwrap();
-                $('#main').prepend(tmp);
-            } else {
-                $("div.pagination").first().remove();
-            }
-        });
-    
-        //Add bbcode buttons to post page and quick reply
-        $('#thingifier-bbcode-buttons').change(function() {
-            DT.bbcode = $(this).is(":checked");
-            setItem("DT", DT);
-            if (DT.bbcode) {
-                $("#forum_post_message").parent().prepend(bbcode_menu);
-            } else {
-                $("div#thingifier-bbcode").remove();
-            }
-        });
-    
-        //Move the quick reply box to the current post
-        $('#thingifier-quote-move-quickreply').change(function() {
-            DT.movequickreply = $(this).is(":checked");
-            setItem("DT", DT);
-            quickreply = $(this).is(":checked");
-        });
-    
-    
-        $('#thingifier-magnifier').change(function() {
-            DT.magnifier = $(this).is(":checked");
-            setItem("DT", DT);
-            if (pageurl.match(/chapters/) || pageurl.match(/images/) && DT.magnifier) {
-                $('body').append('<div id="magnifier"></div>');
-            } else {
-                $('#magnifier').remove();
-            }
-    
-        });
-    
-        //Font size slider
-        $('#thingifier-font-size').on('input', function() {
-            fontsize[0] = parseInt($(this).val());
-            $('.message *').removeClass('forum_post_one');
-            $('.message *').removeClass('forum_post_two');
-            $('.message *').removeClass('forum_post_three');
-            $('.message *').removeClass('forum_post_four');
-            $('.message *').removeClass('forum_post_five');
-            $('.message *').addClass('forum_post_' + fontsize[fontsize[0]]);
-            DT.fontsize = fontsize[0];
-            setItem("DT", DT);
-        });
-    
-        //Reset font size
-        $('#thingifier-reset-font').click(function() {
-            $('.message *').removeClass('forum_post_one');
-            $('.message *').removeClass('forum_post_two');
-            $('.message *').removeClass('forum_post_three');
-            $('.message *').removeClass('forum_post_four');
-            $('.message *').removeClass('forum_post_five');
-            $('#thingifier-font-size').val(3);
-            DT.fontsize = null;
-            setItem("DT", DT);
-        });
-    
-        //Clear saved data
-        $('#thingifier-clear').click(function() {
-            var x = window.confirm("Are you sure you want to clear your stored data?");
-            if (x) {
-                DT = DTp;
-                setItem("DT", DT);
-                document.location.reload(true);
-            } else {
-                console.log("Decided against it");
-            }
-        });
-
-        //Only Pending tag suggestions option - By Gwen Hope
-        $('#thingifier-pending-suggestions').change(function() {
-            DT.pendtags = $(this).is(":checked"); //Updated to use new settings object
-            setItem("DT", DT); //Saves changed settings
-            if (pageurl.match(/user\/suggestions/)) {
-                if (DT.pendtags) { //Updated to use new settings object
-                    $('.suggestion-accepted').hide();
-                    $('.suggestion-rejected').hide();
-                }
-                else {
-                    $('.suggestion-accepted').show();
-                    $('.suggestion-rejected').show();
-                }
-            }
-        });
-    }
+    //Define menu option handlers (this must happen before loading config)
+    setmenuhandlers();
 
     //Load our config
-    function configload() {
-        //Only run once the page is loaded
-        $(document).ready(function() {
-            //Deal with our current menu state
-            menuclose("load");
+    configload();
 
-
-            //Check if spoilers are unhidden
-            if (DT.spoilers) {
-                $('#thingifier-unhide-spoilers').click();
-            }
-
-            //Check if the fixed navbar is enabled
-            if (DT.navbar) {
-                $('#thingifier-fixed-navbar').click();
-            }
-
-            //Check if pagination option is enabled
-            if (DT.pagination) {
-                $('#thingifier-pagination').click();
-            }
-
-            //Check if we've changed the font size and retrieve it
-            fontsize[0] = DT.fontsize;
-            if (fontsize[0] !== null && typeof fontsize[0] !== "undefined") {
-                $('#thingifier-font-size').val(fontsize[0]);
-                $('.message *').addClass('forum_post_' + fontsize[fontsize[0]]);
-            }
-
-            //Check if bbcode buttons are enabled
-            if (DT.bbcode) {
-                $('#thingifier-bbcode-buttons').click();
-            }
-
-            //Check if quote to quick reply option is enabled
-            if (DT.quote2quickreply) {
-                $('#thingifier-quote-to-quickreply').click();
-            }
-
-            //Check if the move quick reply box option is enabled
-            if (DT.movequickreply) {
-                $('#thingifier-quote-move-quickreply').click();
-            }
-
-            //Check if the magnifier option is enabled
-            if (DT.magnifier) {
-                $('#thingifier-magnifier').click();
-            }
-
-            //Check if the pending tags option is enabled
-            //Currently broken though for some reason?
-            if (DT.pendtags) {
-                $('#thingifier-pending-suggestions').click();
-            }
-
-            bbcode();
-        });
+    //Setup own posts link stuff
+    $('#useridinput').hide();
+    $('#useridsubmit').hide();
+    if (DT.yourid == 'Not set!') {
+      $('#thingifier-ownposts').hide();
+      $('#useridinput').show();
+      $('#useridsubmit').show();
+      setuserid();
     }
 
-    function menuclose(sender) {
-        //Only runs when loading a page
-        if (sender === "load") {
-            //configmenustate = GM_getValue("configmenustate", true); //Load our menu state
-            console.log(configmenustate);
-            setTimeout(function() {
-                if (!configmenustate) { //If it's true collapse the menu
-                    $("#thingifier-options").animate({width:'toggle', height:'toggle'},0);
-                    $("#magnifier-submenu-toggle").fadeToggle(0);
-                    menubutton();
-                }
-                $("#thingifier-magnifier-menu").fadeToggle(0);
-                $("#magnifier-tooltip").fadeToggle(0);
-            }, 100);
+    //Check we're viewing a thread
+    if (pageurl.match(/forum\/topics/)) {
+      $('.forum_post').each(function () {
+        postids.push(this.id); //For each element of the class forum_post push the element's id to our postids array
+      });
+      $('.time').each(function (i, obj) {
+        postcount++; //This is where we actually count how many posts are on the page
+      });
 
-            //Runs when clicking the button
-        } else if (sender === "click") {
-            configmenustate = !!configmenustate ? false : true; //XOR our menu state, can also use ^=
-            $("#thingifier-options").animate({width:'toggle', height:'toggle'},350); //Toggle the menu
-            if ($('#thingifier-magnifier-menu').is( ":visible" )) {
-                $('#thingifier-magnifier-menu').fadeToggle(0);
-                $('#magnifier-tooltip').fadeToggle(0);
-            }
-            if ($("#magnifier-submenu-toggle").is( ":visible" )) {
-                $("#magnifier-submenu-toggle").fadeToggle(0);
-            } else {
-                $("#magnifier-submenu-toggle").fadeToggle(500);
-            }
-            menubutton();
+      //Retrieve your user id
+      if (DT.yourid.match(/\d+/)) {
+        if (!DT.yourid.match(/dynasty-scans/) && DT.yourid !== 'Not set!'){
+          DT.yourid = `//dynasty-scans.com/forum/posts?user_id=${DT.yourid}`;
         }
+      } else {
+        DT.yourid = 'Not set!';
+      }
     }
-    function menubutton() {
-        //Controls the button's icon
-        if (!configmenustate) {
-            $('#thingifier-toggle-button').val('▶');
+  }
+
+  //Set user ID for own posts link
+  function setuserid () {
+    $('input#useridsubmit').click(function () {
+      if($('input#useridinput').val().match(/^\d+$/)) {
+        DT.yourid = $('input#useridinput').val();
+        $('#useridinput').hide();
+        $('#useridsubmit').hide();
+        $('#thingifier-ownposts').show();
+        $('#thingifier-ownposts').attr('href', '//dynasty-scans.com/forum/posts?user_id=' + DT.yourid);
+      } else {
+        DT.yourid = 'Not set!';
+        $('input#useridinput').val();
+        $('input#useridinput').val('Invalid user id!');
+      }
+      setItem('DT', DT);
+    });
+  }
+
+  //Define event handlers for options menu items
+  function setmenuhandlers () {
+    //Menu close/open
+    $('input#thingifier-toggle-button').click(function () {
+      menuclose('click');
+    });
+
+    //Unhide spoilers option
+    $('#thingifier-unhide-spoilers').change(function () {
+      DT.spoilers = $(this).is(':checked');
+      setItem('DT', DT);
+      if (DT.spoilers) {
+        $('.spoilers').addClass('spoilers-disabled');
+      } else {
+        $('.spoilers').removeClass('spoilers-disabled');
+      }
+    });
+
+    //Fixed navbar option
+    $('#thingifier-fixed-navbar').change(function () {
+      DT.navbar = $(this).is(':checked');
+      setItem('DT', DT);
+      console.log('Navbar option clicked ' + DT.navbar);
+      if (DT.navbar) {
+        $('.navbar').addClass('navbar-fixed');
+        $('div.forum_post').css('padding-top', 40);
+        $('<div class="nav-padding"></div>').insertAfter('.navbar');
+      } else {
+        $('.navbar').removeClass('navbar-fixed');
+        $('div.forum_post').css('padding-top', 0);
+        $('div.nav-padding').remove();
+      }
+    });
+
+    //Pagination option
+    $('#thingifier-pagination').change(function () {
+      DT.pagination = $(this).is(':checked');
+      setItem('DT', DT);
+      if (DT.pagination) {
+        $('div.pagination').wrap('<div class=\"tmp\">').parent().html();
+        const tmp = $('div.tmp').html();
+        $('div.pagination').unwrap();
+        $('#main').prepend(tmp);
+      } else {
+        $('div.pagination').first().remove();
+      }
+    });
+
+    //Add bbcode buttons to post page and quick reply
+    $('#thingifier-bbcode-buttons').change(function () {
+      DT.bbcode = $(this).is(':checked');
+      setItem('DT', DT);
+      if (DT.bbcode) {
+        $('#forum_post_message').parent().prepend(bbcode_menu);
+      } else {
+        $('div#thingifier-bbcode').remove();
+      }
+    });
+
+    //Move the quick reply box to the current post
+    $('#thingifier-quote-move-quickreply').change(function () {
+      DT.movequickreply = $(this).is(':checked');
+      setItem('DT', DT);
+      quickreply = $(this).is(':checked');
+    });
+
+
+    $('#thingifier-magnifier').change(function () {
+      DT.magnifier = $(this).is(':checked');
+      setItem('DT', DT);
+      if (pageurl.match(/chapters/) || pageurl.match(/images/) && DT.magnifier) {
+        $('body').append('<div id="magnifier"></div>');
+      } else {
+        $('#magnifier').remove();
+      }
+
+    });
+
+    //Font size slider
+    $('#thingifier-font-size').on('input', function () {
+      fontsize[0] = parseInt($(this).val());
+      $('.message *').removeClass('forum_post_one');
+      $('.message *').removeClass('forum_post_two');
+      $('.message *').removeClass('forum_post_three');
+      $('.message *').removeClass('forum_post_four');
+      $('.message *').removeClass('forum_post_five');
+      $('.message *').addClass('forum_post_' + fontsize[fontsize[0]]);
+      DT.fontsize = fontsize[0];
+      setItem('DT', DT);
+    });
+
+    //Reset font size
+    $('#thingifier-reset-font').click(function () {
+      $('.message *').removeClass('forum_post_one');
+      $('.message *').removeClass('forum_post_two');
+      $('.message *').removeClass('forum_post_three');
+      $('.message *').removeClass('forum_post_four');
+      $('.message *').removeClass('forum_post_five');
+      $('#thingifier-font-size').val(3);
+      DT.fontsize = null;
+      setItem('DT', DT);
+    });
+
+    //Clear saved data
+    $('#thingifier-clear').click(function () {
+      const x = window.confirm('Are you sure you want to clear your stored data?');
+      if (x) {
+        DT = DTp;
+        setItem('DT', DT);
+        document.location.reload(true);
+      } else {
+        console.log('Decided against it');
+      }
+    });
+
+    //Only Pending tag suggestions option - By Gwen Hope
+    $('#thingifier-pending-suggestions').change(function () {
+      DT.pendtags = $(this).is(':checked'); //Updated to use new settings object
+      setItem('DT', DT); //Saves changed settings
+      if (pageurl.match(/user\/suggestions/)) {
+        if (DT.pendtags) { //Updated to use new settings object
+          $('.suggestion-accepted').hide();
+          $('.suggestion-rejected').hide();
         } else {
-            $('#thingifier-toggle-button').val('◀');
+          $('.suggestion-accepted').show();
+          $('.suggestion-rejected').show();
         }
+      }
+    });
+  }
+
+  //Load our config
+  function configload () {
+    //Only run once the page is loaded
+    $(document).ready(function () {
+      //Deal with our current menu state
+      menuclose('load');
+
+
+      //Check if spoilers are unhidden
+      if (DT.spoilers) {
+        $('#thingifier-unhide-spoilers').click();
+      }
+
+      //Check if the fixed navbar is enabled
+      if (DT.navbar) {
+        $('#thingifier-fixed-navbar').click();
+      }
+
+      //Check if pagination option is enabled
+      if (DT.pagination) {
+        $('#thingifier-pagination').click();
+      }
+
+      //Check if we've changed the font size and retrieve it
+      fontsize[0] = DT.fontsize;
+      if (fontsize[0] !== null && typeof fontsize[0] !== 'undefined') {
+        $('#thingifier-font-size').val(fontsize[0]);
+        $('.message *').addClass('forum_post_' + fontsize[fontsize[0]]);
+      }
+
+      //Check if bbcode buttons are enabled
+      if (DT.bbcode) {
+        $('#thingifier-bbcode-buttons').click();
+      }
+
+      //Check if quote to quick reply option is enabled
+      if (DT.quote2quickreply) {
+        $('#thingifier-quote-to-quickreply').click();
+      }
+
+      //Check if the move quick reply box option is enabled
+      if (DT.movequickreply) {
+        $('#thingifier-quote-move-quickreply').click();
+      }
+
+      //Check if the magnifier option is enabled
+      if (DT.magnifier) {
+        $('#thingifier-magnifier').click();
+      }
+
+      //Check if the pending tags option is enabled
+      //Currently broken though for some reason?
+      if (DT.pendtags) {
+        $('#thingifier-pending-suggestions').click();
+      }
+
+      bbcode();
+    });
+  }
+
+  function menuclose (sender) {
+    //Only runs when loading a page
+    if (sender === 'load') {
+      //configmenustate = GM_getValue("configmenustate", true); //Load our menu state
+      console.log(configmenustate);
+      setTimeout(function () {
+        if (!configmenustate) { //If it's true collapse the menu
+          $('#thingifier-options').animate({width:'toggle', height:'toggle'}, 0);
+          $('#magnifier-submenu-toggle').fadeToggle(0);
+          menubutton();
+        }
+        $('#thingifier-magnifier-menu').fadeToggle(0);
+        $('#magnifier-tooltip').fadeToggle(0);
+      }, 100);
+
+      //Runs when clicking the button
+    } else if (sender === 'click') {
+      configmenustate = configmenustate ? false : true; //XOR our menu state, can also use ^=
+      $('#thingifier-options').animate({width:'toggle', height:'toggle'}, 350); //Toggle the menu
+      if ($('#thingifier-magnifier-menu').is( ':visible' )) {
+        $('#thingifier-magnifier-menu').fadeToggle(0);
+        $('#magnifier-tooltip').fadeToggle(0);
+      }
+      if ($('#magnifier-submenu-toggle').is( ':visible' )) {
+        $('#magnifier-submenu-toggle').fadeToggle(0);
+      } else {
+        $('#magnifier-submenu-toggle').fadeToggle(500);
+      }
+      menubutton();
+    }
+  }
+  function menubutton () {
+    //Controls the button's icon
+    if (!configmenustate) {
+      $('#thingifier-toggle-button').val('▶');
+    } else {
+      $('#thingifier-toggle-button').val('◀');
+    }
+  }
+
+  function bbcode () {
+    let texttmp,
+      sel,
+      posttmp,
+      regextmp,
+      txtbegin,
+      txtend;
+    $('#forum_post_message').mousedown(function () {
+      $('body').mouseup(function () {
+        getSel();
+        texttmp = sel;
+        posttmp = $('#forum_post_message').val();
+        regextmp = new RegExp('('+texttmp.replace(/[.?*+^$[\]\\(){}|-]/g, '\\$&')+')');
+        posttmp = posttmp.replace(regextmp, '[BBCODE-HERE]');
+      });
+    });
+    function getSel () // javascript
+    {
+      // obtain the object reference for the <textarea>
+      const txtarea = document.getElementById('forum_post_message');
+      // obtain the index of the first selected character
+      const start = txtarea.selectionStart;
+      // obtain the index of the last selected character
+      const finish = txtarea.selectionEnd;
+      // obtain the selected text
+      sel = txtarea.value.substring(start, finish);
+      txtbegin = txtarea.value.substring(0, start);
+      txtend = txtarea.value.substring(finish);
+      // do something with the selected content
+    }
+    $('#thingifier-bbcode-quote').click(function () {
+      texttmp = texttmp.replace(/(^\S)/gm, '> $1');
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-link').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '[]($1)');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '[]($1)');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-image').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '![]($1)');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '![]($1)');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-spoiler').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '==$1==');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '==$1==');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-hr').click(function () {
+      texttmp = texttmp.replace(/(^\S)/gm, '\n***\n $1');
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-ul').click(function () {
+      texttmp = texttmp.replace(/(^\S)/gm, ' * $1');
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-ol').click(function () {
+      texttmp = texttmp.replace(/(^\S)/gm, ' 1. $1');
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-italics').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '*$1*');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '*$1*');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-bold').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '**$1**');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '**$1**');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-tag').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '`$1`');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '`$1`');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-codeblock').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '    $1    ');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '    $1    ');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-h1').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '# $1 #');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '# $1 #');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-h2').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '## $1 ##');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '## $1 ##');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-h3').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '### $1 ###');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '### $1 ###');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-h4').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '#### $1 ####');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '#### $1 ####');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-h5').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '##### $1 #####');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '##### $1 #####');
+      }
+      bbcode_format();
+    });
+    $('#thingifier-bbcode-h6').click(function () {
+      if (sel.length === 0) {
+        texttmp = texttmp.replace(/(.*)/gm, '###### $1 ######');
+      } else {
+        texttmp = texttmp.replace(/(.+)/gm, '###### $1 ######');
+      }
+      bbcode_format();
+    });
+    function bbcode_format () {
+      var tmp = txtbegin + texttmp.replace(/\[BBCODE-HERE\]/, tmp) + txtend;
+      $('#forum_post_message').val(tmp);
+    }
+  }
+  $(document).ready(function () {
+    if (isuserpostsurl.match(/https:\/\/dynasty-scans.com\/forum\/posts\?user_id=\d+/)) {
+      isuserpostsurl = isuserpostsurl.replace(/\d+/, ''); //Replaces the user id in the url
+    }
+    for (var i = 0; i < postcount; i++){
+      counter = i;
+      let id = postids[i].toString(); //Temporarily store the post id under the key of 'i' into a variable to use in our next bit
+      if ($('#thingifier-quote-to-quickreply').is(':checked')) {
+        const tmp = $('.forum_post .info .row .actions').find('span:first-child a');
+        const tmphref = tmp.attr('href');
+        let urltmp = document.location.toString();
+        urltmp = urltmp.replace(/(https:\/\/dynasty-scans\.com\/forum\/topics\/)(\d+)(.+)/, '$2');
+        $('.forum_post .info .row .actions:eq(' + counter + ')').prepend('<input type="button" class="postquote" id="' + tmphref + '" value="Quick Quote" name="post_' + counter + '">');
+        id = id.replace(/forum_post_/, '');
+      }
+      counter++;
+    }
+    $('#thingifier-quote-to-quickreply').click(function () {
+      DT.quote2quickreply = $('#thingifier-quote-to-quickreply').is(':checked');
+      setItem('DT', DT);
+    });
+    $('input.postquote').mouseup(function (e) {
+      document.getElementById('forum_post_message').value = '';
+      let postid = $($(this).parents()[3]).attr('id');
+      let quoteid = postid; //Gets the id of the .forum_post parent
+      quoteid = '#' + quoteid; //Adds a url anchor sign to the id
+      quoteid = quoteid.toString(); //Converts it to a string to make sure it cooperates
+      setItem('quoteid', pageurl + quoteid);
+      const quotename = $.trim($(quoteid).find('.user').text().replace(/Staff|Moderator|Uploader/, '')); //Retrieve the quoted user's name
+      //For staff, mods, and uploaders find and remove their title, then trim the whitespace/newlines off the beginning and end
+      setItem('quotename', quotename);
+      postid = postid.replace(/forum_post_/, '');
+      let threadid = document.location.toString();
+      threadid = threadid.replace(/(https:\/\/dynasty-scans\.com\/forum\/topics\/)(\d+)(\S+)/, '$2');
+      let postpath = '//dynasty-scans.com/forum/posts/new?quote_id="' + postid +'"&topic_id="' + threadid + '"';
+      postpath = postpath.replace(/"/g, '');
+      postid = postid.replace(/post_/, '');
+      getpost(postpath, postid);
+      if (quickreply) {
+        let replybox;
+        if ($('#thingifier-quickreply').length < 1) {
+          $('#new_forum_post').wrap('<div id="thingifier-quickreply"></div>');
+          $('<input class="btn" id="thingifier-cancel" type="button" value="Cancel Post">').insertAfter('#new_forum_post input.btn:last');
+        }
+        if (!replybox) {
+          replybox = $('#thingifier-quickreply').detach();
+          replybox.appendTo(quoteid);
+          replybox = null;
+        }
+      }
+      if ($('#thingifier-quickreply').offset().top > window.pageYOffset + document.documentElement.clientHeight || $('#thingifier-quickreply').offset().top < window.pageYOffset) {
+        $(document).scrollTop($('#thingifier-quickreply').offset().top - $('div.nav-padding').height());
+      }
+    });
+
+    $(document).on('click', 'input#thingifier-cancel', function (){
+      console.log('Clicked');
+      const replybox = $('#new_forum_post').detach();
+      $('#thingifier-quickreply').remove();
+      replybox.appendTo('div.row:last');
+      $('#thingifier-cancel').remove();
+    });
+
+    //Do this if we click the quote button
+    $('a').mouseup(function (e) { //When we click a link run this code
+      if ($(e.target).text() == 'Quote') { //Make sure that the clicked link is the quote button
+        let quoteid = $(e.target).parents(); //Gets all the parent elements of our link
+        quoteid = quoteid[4]; //Selects the fourth parent which is the .forum_post parent of the link
+        quoteid = $(quoteid).attr('id'); //Gets the id of the .forum_post parent
+        quoteid = '#' + quoteid; //Adds a url anchor sign to the id
+        quoteid = quoteid.toString(); //Converts it to a string to make sure it cooperates
+        setItem('quoteid', pageurl + quoteid);
+        let quotename = $(quoteid).find('.user').text(); //Retrieve the quoted user's name
+        quotename = quotename.replace(/Staff|Moderator|Uploader/, ''); //For staff, mods, and uploaders find and remove their title
+        quotename = $.trim(quotename); //Trim the whitespace/newlines off the beginning and end
+        setItem('quotename', quotename);
+      } else { /*This is where code would run if we were doing anything for clicking other links*/ }
+    });
+
+    //Check that the current page is the new posts page
+    if (pageurl.match(/posts\/new/)) {
+      //Don't use the custom getItem() for these. That's only meant for JSON items
+      const post = localStorage.getItem('quoteid', false);
+      const username = localStorage.getItem('quotename', false);
+      if (Boolean(post) && Boolean(username)) {
+        quote = '> [**' + username + '** posted:](' + post + ') \n> ';
+        const message = '\n' + $('#forum_post_message').val();
+        $('#forum_post_message').val(quote + message);
+        setItem('post', false);
+        setItem('username', false);
+      }
     }
 
-    function bbcode() {
-        var texttmp,
-            sel,
-            posttmp,
-            regextmp,
-            txtbegin,
-            txtend;
-        $('#forum_post_message').mousedown(function() {
-            $('body').mouseup(function() {
-                getSel();
-                texttmp = sel;
-                posttmp = $('#forum_post_message').val();
-                regextmp = new RegExp("("+texttmp.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&")+")");
-                posttmp = posttmp.replace(regextmp, "[BBCODE-HERE]");
-            });
-        });
-        function getSel() // javascript
-        {
-            // obtain the object reference for the <textarea>
-            var txtarea = document.getElementById("forum_post_message");
-            // obtain the index of the first selected character
-            var start = txtarea.selectionStart;
-            // obtain the index of the last selected character
-            var finish = txtarea.selectionEnd;
-            // obtain the selected text
-            sel = txtarea.value.substring(start, finish);
-            txtbegin = txtarea.value.substring(0, start);
-            txtend = txtarea.value.substring(finish);
-            // do something with the selected content
-        }
-        $('#thingifier-bbcode-quote').click(function() {
-            texttmp = texttmp.replace(/(^\S)/gm, "> $1");
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-link').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "[]($1)");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "[]($1)");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-image').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "![]($1)");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "![]($1)");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-spoiler').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "==$1==");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "==$1==");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-hr').click(function() {
-            texttmp = texttmp.replace(/(^\S)/gm, "\n***\n $1");
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-ul').click(function() {
-            texttmp = texttmp.replace(/(^\S)/gm, " * $1");
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-ol').click(function() {
-            texttmp = texttmp.replace(/(^\S)/gm, " 1. $1");
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-italics').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "*$1*");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "*$1*");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-bold').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "**$1**");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "**$1**");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-tag').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "`$1`");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "`$1`");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-codeblock').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "    $1    ");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "    $1    ");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-h1').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "# $1 #");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "# $1 #");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-h2').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "## $1 ##");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "## $1 ##");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-h3').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "### $1 ###");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "### $1 ###");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-h4').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "#### $1 ####");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "#### $1 ####");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-h5').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "##### $1 #####");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "##### $1 #####");
-            }
-            bbcode_format();
-        });
-        $('#thingifier-bbcode-h6').click(function() {
-            if (sel.length === 0) {
-                texttmp = texttmp.replace(/(.*)/gm, "###### $1 ######");
-            } else {
-                texttmp = texttmp.replace(/(.+)/gm, "###### $1 ######");
-            }
-            bbcode_format();
-        });
-        function bbcode_format() {
-            var tmp = txtbegin + texttmp.replace(/\[BBCODE-HERE\]/, tmp) + txtend;
-            $('#forum_post_message').val(tmp);
-        }
+    //Insert "unread posts" button after thread link in manga viewer
+    if (pageurl.match(/chapters/)) {
+      const mangathread = '<a class="btn btn-mini" title="View latest unread post in thread"href="' + $('div.btn-toolbar div.btn-group:first-child a.btn:first-child').attr('href') + '/unread"><i class="icon-comment"></i>Unread</a>';
+      $(mangathread).insertAfter('div.btn-toolbar div.btn-group:first-child a.btn:first-child');
     }
-    $(document).ready(function() {
-        if (isuserpostsurl.match(/https:\/\/dynasty-scans.com\/forum\/posts\?user_id=\d+/)) {
-            isuserpostsurl = isuserpostsurl.replace(/\d+/, ""); //Replaces the user id in the url
+
+    //Insert last post link to read threads
+    if (pageurl.match(/\/forum(?!\/topics)/)) {
+      const elements = $('div.forum_topic').length;
+      for (i = 0; i < elements; i++) {
+        //Retrieve the last page link or the base thread link if the thread is only one page
+        const linktype = $('div.forum_topic:eq(' + i + ') span.pages a:last').attr('href') || $('div.forum_topic:eq(' + i + ') a.subject').attr('href');
+        //Create our last post link
+        const link = '<a class="thingifier-lastlink" href="' + linktype + '#lastpost" style="margin-left:10px;"><i class="icon-comment"></i>Last Post</a>';
+        //Check if thread has multiple pages. If so place link after pagination, otherwise place it right after the thread link
+        if ($('div.forum_topic:eq(' + i + ')').find('span.pages').length !== 0) {
+          $(link).insertAfter('div.forum_topic:eq(' + i + ') span.pages');
+        } else {
+          $(link).insertAfter('div.forum_topic:eq(' + i + ') a.subject');
         }
-        for (var i = 0; i < postcount; i++){
-            counter = i;
-            var id = postids[i].toString(); //Temporarily store the post id under the key of 'i' into a variable to use in our next bit
-            if ($('#thingifier-quote-to-quickreply').is(":checked")) {
-                var tmp = $('.forum_post .info .row .actions').find("span:first-child a");
-                var tmphref = tmp.attr('href');
-                var urltmp = document.location.toString();
-                urltmp = urltmp.replace(/(https:\/\/dynasty-scans\.com\/forum\/topics\/)(\d+)(.+)/, "$2");
-                $('.forum_post .info .row .actions:eq(' + counter + ')').prepend("<input type=\"button\" class=\"postquote\" id=\"" + tmphref + "\" value=\"Quick Quote\" name=\"post_" + counter + "\">");
-                id = id.replace(/forum_post_/, "");
-            }
-            counter++;
+      }
+    }
+
+    //Check if we clicked the last post button on the forum view
+    $('a.thingifier-lastlink').mouseup(function (e) {
+      if (e.which === 1 || e.which === 2) {
+        const threadnum = $(this).attr('href').match(/(\d+)/)[0]; //Retrieve the clicked thread's ID
+        setItem('lastlink_' + threadnum, true); //If we left or middle clicked it then set our lastlink value for that thread to true
+      }
+    });
+
+    //Check if we're viewing a topic
+    if (pageurl.match(/\/forum\/topics/) && window.location.toString().match(/#lastpost/)) {
+      document.onreadystatechange = function () {
+        if (document.readyState === 'complete') {
+          window.location = `${pageurl}#${$('div.time a:last').parents()[3].id}`;
         }
-        $('#thingifier-quote-to-quickreply').click(function() {
-            DT.quote2quickreply = $('#thingifier-quote-to-quickreply').is(":checked");
-            setItem("DT", DT);
-        });
-        $('input.postquote').mouseup(function(e) {
-            document.getElementById('forum_post_message').value = "";
-            var postid = $($(this).parents()[3]).attr('id');
-            var quoteid = postid; //Gets the id of the .forum_post parent
-            quoteid = "#" + quoteid; //Adds a url anchor sign to the id
-            quoteid = quoteid.toString(); //Converts it to a string to make sure it cooperates
-            setItem("quoteid", pageurl + quoteid);
-            var quotename = $.trim($(quoteid).find(".user").text().replace(/Staff|Moderator|Uploader/, "")); //Retrieve the quoted user's name
-            //For staff, mods, and uploaders find and remove their title, then trim the whitespace/newlines off the beginning and end
-            setItem("quotename", quotename);
-            postid = postid.replace(/forum_post_/, "");
-            var threadid = document.location.toString();
-            threadid = threadid.replace(/(https:\/\/dynasty-scans\.com\/forum\/topics\/)(\d+)(\S+)/, "$2");
-            var postpath = "//dynasty-scans.com/forum/posts/new?quote_id=\"" + postid +"\"&topic_id=\"" + threadid + "\"";
-            postpath = postpath.replace(/"/g, "");
-            postid = postid.replace(/post_/, "");
-            getpost(postpath, postid);
-            if (quickreply) {
-                var replybox;
-                if ($("#thingifier-quickreply").length < 1) {
-                    $("#new_forum_post").wrap("<div id=\"thingifier-quickreply\"></div>");
-                    $('<input class="btn" id="thingifier-cancel" type="button" value="Cancel Post">').insertAfter("#new_forum_post input.btn:last");
-                }
-                if (!replybox) {
-                    replybox = $("#thingifier-quickreply").detach();
-                    replybox.appendTo(quoteid);
-                    replybox = null;
-                }
-            }
-            if ($("#thingifier-quickreply").offset().top > window.pageYOffset + document.documentElement.clientHeight || $("#thingifier-quickreply").offset().top < window.pageYOffset) {
-                $(document).scrollTop($("#thingifier-quickreply").offset().top - $('div.nav-padding').height());
-            }
-        });
+      };
+    }
 
-        $(document).on("click", "input#thingifier-cancel", function(){
-            console.log("Clicked");
-            var replybox = $('#new_forum_post').detach();
-            $("#thingifier-quickreply").remove();
-            replybox.appendTo('div.row:last');
-            $('#thingifier-cancel').remove();
-        });
 
-        //Do this if we click the quote button
-        $('a').mouseup(function(e) { //When we click a link run this code
-            if ($(e.target).text() == "Quote") { //Make sure that the clicked link is the quote button
-                var quoteid = $(e.target).parents(); //Gets all the parent elements of our link
-                quoteid = quoteid[4]; //Selects the fourth parent which is the .forum_post parent of the link
-                quoteid = $(quoteid).attr('id'); //Gets the id of the .forum_post parent
-                quoteid = "#" + quoteid; //Adds a url anchor sign to the id
-                quoteid = quoteid.toString(); //Converts it to a string to make sure it cooperates
-                setItem("quoteid", pageurl + quoteid);
-                var quotename = $(quoteid).find(".user").text(); //Retrieve the quoted user's name
-                quotename = quotename.replace(/Staff|Moderator|Uploader/, ""); //For staff, mods, and uploaders find and remove their title
-                quotename = $.trim(quotename); //Trim the whitespace/newlines off the beginning and end
-                setItem("quotename", quotename);
-            } else { /*This is where code would run if we were doing anything for clicking other links*/ }
-        });
+    //Magnifier Function
+    let magY, magX, magShown = 0, imgPath = 'none', zoom = GM_getValue('magZoomFactor', '500'), zoomFactor = zoom / 100, pWidth = 0, pHeight = 0, pOffset = 0, magZ = false;
+    const updater = window.setInterval(update, 100);
 
-        //Check that the current page is the new posts page
-        if (pageurl.match(/posts\/new/)) {
-            //Don't use the custom getItem() for these. That's only meant for JSON items
-            var post = localStorage.getItem("quoteid", false);
-            var username = localStorage.getItem("quotename", false);
-            if (!!post && !!username) {
-                quote = "> [**" + username + "** posted:](" + post + ") \n> ";
-                var message = "\n" + $('#forum_post_message').val();
-                $('#forum_post_message').val(quote + message);
-                setItem("post", false);
-                setItem("username", false);
-            }
+
+    $(document).mousemove(function (e) {
+      if (DT.magnifier && (pageurl.match(/images/) || pageurl.match(/chapters/))) {
+        zoomFactor = zoom / 100;
+        magY = e.pageY;
+        magX = e.pageX;
+        $('#magnifier').offset({ top: magY - ($('#magnifier').height() / 2), left: magX - ($('#magnifier').width() / 2) });
+        const backLeft = ((-magX + pOffset.left) * zoomFactor) + 130;
+        const backTop = ((-magY + pOffset.top) * zoomFactor) + 130;
+        $('#magnifier').css('background-position', backLeft + 'px ' + backTop + 'px');
+      }
+    });
+    $(document).mousedown(function (e) {
+      if (DT.magnifier) {
+        let tmp = $(e.target).parent()[0];
+        if (tmp.className === 'image' && pageurl.match(/images/)) {
+          tmp = tmp.className;
+        } else if (tmp.id === 'image' && pageurl.match(/chapters/)) {
+          tmp = tmp.id;
+        } else {
+          tmp = false;
         }
+        tmp = Boolean(tmp);
+        if (e.which === 2 && tmp !== false) {
+          e.preventDefault();
+        }
+        magnifier(tmp, e.which);
+      }
+    });
+    $(document).keydown(function (e) {
+      if (e.which == 90) {
+        if (DT.magnifier && pageurl.match(/chapters/) || pageurl.match(/images/)) {
+          if (!$('#forum_post_message').is(':focus') && !$('input#q').is(':focus')) {
+            e.preventDefault();
+            magZ = true;
+          } else {
+            magZ = false;
+          }
+          if (magZ === true) {
+            magnifier(magZ, 2);
+          }
+        }
+      }
+    });
 
-        //Insert "unread posts" button after thread link in manga viewer
+    function magnifier (check, which) {
+      if (DT.magnifier) {
+        if (check) {
+          magShown = magShown ? 0 : 1;
+        }
+        if (Boolean(magShown) && Boolean(check) && which === 2) {
+          //$('body').append('<canvas id="magcan" height="250px" width="250px" style="position: absolute; right: 0; bottom: 0;">');
+          $('#magnifier').css('visibility', 'visible');
+          $('#magnifier').css('display', 'inline');
+          $('*').css('cursor', 'none');
+          $('#magnifier').css({
+            'min-width' : `${DT.mag.minSizeRes}${DT.mag.minSizeMeasure}`,
+            'min-height' : `${DT.mag.minSizeRes}${DT.mag.minSizeMeasure}`,
+            'width' :  `${DT.mag.sizeRes}${DT.mag.sizeMeasure}`,
+            'height' :  `${DT.mag.sizeRes}${DT.mag.sizeMeasure}`,
+            'border-radius' : `${DT.mag.border}`
+          });
+          zoom = DT.mag.zoomFactor;
+          $('#magnifier').offset({ top: magY - ($('#magnifier').height() / 2), left: magX - ($('#magnifier').width() / 2) });
+        } else {
+          $('#magnifier').css('visibility', 'hidden');
+          $('#magnifier').css('display', 'none');
+          $('*').css('cursor', 'auto');
+          $('a').css('cursor', 'pointer');
+          $('a *').css('cursor', 'pointer');
+          $('span.left').css('cursor', 'pointer');
+          $('span.right').css('cursor', 'pointer');
+        }
+      }
+    }
+    function update () {
+      if (DT.magnifier) {
+        pOffset = $('#image img').offset() || $('div.image img').offset();
         if (pageurl.match(/chapters/)) {
-            var mangathread = '<a class="btn btn-mini" title="View latest unread post in thread"href="' + $('div.btn-toolbar div.btn-group:first-child a.btn:first-child').attr('href') + '/unread"><i class="icon-comment"></i>Unread</a>';
-            $(mangathread).insertAfter('div.btn-toolbar div.btn-group:first-child a.btn:first-child');
+          pWidth = $('div#image.thumbnail img').width() || $('div#image').width();
+          pHeight = $('div#image.thumbnail img').height() || $('div#image').height();
+          //imgPath = $('div#image.thumbnail img').attr('src') || $('div#image img').attr('src') || "none";
+          imgPath = $('#download_page').attr('href') || 'none';
+          //console.log(imgPath);
+        } else if (pageurl.match(/images/)) {
+          pWidth = $('div.image img').width();
+          pHeight = $('div.image img').height();
+          imgPath = $('div.image img').attr('src') || 'none';
         }
-
-        //Insert last post link to read threads
-        if (pageurl.match(/\/forum(?!\/topics)/)) {
-            var elements = $('div.forum_topic').length;
-            for (i = 0; i < elements; i++) {
-                //Retrieve the last page link or the base thread link if the thread is only one page
-                var linktype = $('div.forum_topic:eq(' + i + ') span.pages a:last').attr('href') || $('div.forum_topic:eq(' + i + ') a.subject').attr('href');
-                //Create our last post link
-                var link = '<a class="thingifier-lastlink" href="' + linktype + '#lastpost" style="margin-left:10px;"><i class="icon-comment"></i>Last Post</a>';
-                //Check if thread has multiple pages. If so place link after pagination, otherwise place it right after the thread link
-                if ($('div.forum_topic:eq(' + i + ')').find('span.pages').length !== 0) {
-                    $(link).insertAfter('div.forum_topic:eq(' + i + ') span.pages');
-                } else {
-                    $(link).insertAfter('div.forum_topic:eq(' + i + ') a.subject');
-                }
-            }
-        }
-
-        //Check if we clicked the last post button on the forum view
-        $('a.thingifier-lastlink').mouseup(function(e) {
-            if (e.which === 1 || e.which === 2) {
-                var threadnum = $(this).attr('href').match(/(\d+)/)[0]; //Retrieve the clicked thread's ID
-                setItem('lastlink_' + threadnum, true); //If we left or middle clicked it then set our lastlink value for that thread to true
-            }
-        });
-
-        //Check if we're viewing a topic
-        if (pageurl.match(/\/forum\/topics/) && window.location.toString().match(/#lastpost/)) {
-            document.onreadystatechange = function() {
-                if (document.readyState === "complete") {
-                    window.location = `${pageurl}#${$('div.time a:last').parents()[3].id}`;
-                }
-            };
-        }
-
-
-        //Magnifier Function
-        var magY, magX, magShown = 0, imgPath = "none", zoom = GM_getValue('magZoomFactor', '500'), zoomFactor = zoom / 100, pWidth = 0, pHeight = 0, pOffset = 0, magZ = false;
-        var updater = window.setInterval(update, 100);
-
-
-        $(document).mousemove(function(e) {
-            if (DT.magnifier && (pageurl.match(/images/) || pageurl.match(/chapters/))) {
-                zoomFactor = zoom / 100;
-                magY = e.pageY;
-                magX = e.pageX;
-                $('#magnifier').offset({ top: magY - ($('#magnifier').height() / 2), left: magX - ($('#magnifier').width() / 2) });
-                var backLeft = ((-magX + pOffset.left) * zoomFactor) + 130;
-                var backTop = ((-magY + pOffset.top) * zoomFactor) + 130;
-                $('#magnifier').css("background-position", backLeft + "px " + backTop + "px");
-            }
-        });
-        $(document).mousedown(function(e) {
-            if (DT.magnifier) {
-                var tmp = $(e.target).parent()[0];
-                if (tmp.className === "image" && pageurl.match(/images/)) {
-                    tmp = tmp.className;
-                } else if (tmp.id === "image" && pageurl.match(/chapters/)) {
-                    tmp = tmp.id;
-                } else {
-                    tmp = false;
-                }
-                tmp = !!tmp;
-                if (e.which === 2 && tmp !== false) {
-                    e.preventDefault();
-                }
-                magnifier(tmp, e.which);
-            }
-        });
-        $(document).keydown(function(e) {
-            if (e.which == 90) {
-                if (DT.magnifier && pageurl.match(/chapters/) || pageurl.match(/images/)) {
-                    if (!$('#forum_post_message').is(":focus") && !$('input#q').is(":focus")) {
-                        e.preventDefault();
-                        magZ = true;
-                    } else {
-                        magZ = false;
-                    }
-                    if (magZ === true) {
-                        magnifier(magZ, 2);
-                    }
-                }
-            }
-        });
-
-        function magnifier(check, which) {
-            if (DT.magnifier) {
-                if (!!check) {
-                    magShown = magShown ? 0 : 1;
-                }
-                if (!!magShown && !!check && which === 2) {
-                    //$('body').append('<canvas id="magcan" height="250px" width="250px" style="position: absolute; right: 0; bottom: 0;">');
-                    $('#magnifier').css("visibility", "visible");
-                    $('#magnifier').css("display", "inline");
-                    $('*').css("cursor", "none");
-                    $('#magnifier').css({
-                        'min-width' : `${DT.mag.minSizeRes}${DT.mag.minSizeMeasure}`,
-                        'min-height' : `${DT.mag.minSizeRes}${DT.mag.minSizeMeasure}`,
-                        'width' :  `${DT.mag.sizeRes}${DT.mag.sizeMeasure}`,
-                        'height' :  `${DT.mag.sizeRes}${DT.mag.sizeMeasure}`,
-                        'border-radius' : `${DT.mag.border}`
-                    });
-                    zoom = DT.mag.zoomFactor;
-                    $('#magnifier').offset({ top: magY - ($('#magnifier').height() / 2), left: magX - ($('#magnifier').width() / 2) });
-                } else {
-                    $('#magnifier').css("visibility", "hidden");
-                    $('#magnifier').css("display", "none");
-                    $('*').css("cursor", "auto");
-                    $('a').css("cursor", "pointer");
-                    $('a *').css("cursor", "pointer");
-                    $('span.left').css("cursor", "pointer");
-                    $('span.right').css("cursor", "pointer");
-                }
-            }
-        }
-        function update() {
-            if (DT.magnifier) {
-                pOffset = $('#image img').offset() || $('div.image img').offset();
-                if (pageurl.match(/chapters/)) {
-                    pWidth = $('div#image.thumbnail img').width() || $('div#image').width();
-                    pHeight = $('div#image.thumbnail img').height() || $('div#image').height();
-                    //imgPath = $('div#image.thumbnail img').attr('src') || $('div#image img').attr('src') || "none";
-                    imgPath = $('#download_page').attr('href') || "none";
-                    //console.log(imgPath);
-                } else if (pageurl.match(/images/)) {
-                    pWidth = $('div.image img').width();
-                    pHeight = $('div.image img').height();
-                    imgPath = $('div.image img').attr('src') || "none";
-                }
-                if (imgPath !== "none") {
-                    /*var canvas = document.getElementById('magcan');
+        if (imgPath !== 'none') {
+          /*var canvas = document.getElementById('magcan');
             var ctx = canvas.getContext('2d');
             var img = new Image();   // Create new img element
             img.src = imgPath; // Set source path
             ctx.drawImage(img,0,0);*/
-                    $('#magnifier').css("background-image", "url(" + imgPath + ")");
-                    //Zoom works correctly but the offset is WAY off
-                    /*var img = new Image;
+          $('#magnifier').css('background-image', 'url(' + imgPath + ')');
+          //Zoom works correctly but the offset is WAY off
+          /*var img = new Image;
           img.src = imgPath;
           pWidth = img.width;
           pHeight = img.height;*/
-                    $('#magnifier').css("background-size", (pWidth * zoomFactor) + "px " + (pHeight * zoomFactor) + "px");
-                }
-            }
+          $('#magnifier').css('background-size', (pWidth * zoomFactor) + 'px ' + (pHeight * zoomFactor) + 'px');
         }
-
-        $('i#magnifier-submenu-toggle').click(function() {
-            $("#thingifier-magnifier-menu").fadeToggle(350);
-            $("#magnifier-tooltip").fadeToggle(350);
-            $('#sizenum').val(DT.mag.sizeRes);
-            $('#sizemeasure').val(DT.mag.sizeMeasure);
-            $('#minsizenum').val(DT.mag.minSizeRes);
-            $('#minsizemeasure').val(DT.mag.minSizeMeasure);
-            $('#zoomfactor').val(DT.mag.zoomFactor);
-            if (GM_getValue('magBorder', '50%') === '50%') {
-                $('#circularborder').click();
-            } else {
-                $('#squareborder').click();
-            }
-        });
-        $('#forcircle').click(function() {
-            $('#circularborder').click();
-        });
-        $('#forsquare').click(function() {
-            $('#squareborder').click();
-        });
-        $('#magnifier-menu-submit').click(function() {
-            var ferror = "",
-                border,
-                sizemeasure,
-                minsizemeasure,
-                size,
-                minsize;
-            if ($('#circularborder').is(':checked')) {
-                border = "50%";
-            } else {
-                border = "0";
-            }
-            //Size number
-            if ($('#sizenum').val().toString().match(/\d/g) !== null) {
-                size = $('#sizenum').val();
-            } else {
-                ferror += "Please use a number for the size!\n";
-            }
-            //Size measurement type
-            if (measurecheck($('#sizemeasure').val())) {
-                sizemeasure = $('#sizemeasure').val();
-            } else {
-                ferror += "Please use a valid type for the size!\n";
-            }
-            //Minimum size number
-            if ($('#minsizenum').val().toString().match(/\d/g) !== null) {
-                minsize = $('#minsizenum').val();
-            } else {
-                ferror += "Please use a number for the minimum size!\n";
-            }
-            //Minimum size measurement type
-            if (measurecheck($('#minsizemeasure').val())) {
-                minsizemeasure = $('#minsizemeasure').val();
-            } else {
-                ferror += "Please use a valid type for the minimum size!\n";
-            }
-            //Zoom factor
-            if ($('#zoomfactor').val().toString().match(/\d/g) !== null) {
-                zoom = $('#zoomfactor').val();
-            } else {
-                ferror += "Please use a number for the zoomfactor!\n";
-            }
-            //Check for errors or save
-            if (ferror !== "") {
-                alert(ferror);
-            } else {
-                DT.mag.sizeRes = size;
-                DT.mag.sizeMeasure = sizemeasure;
-                DT.mag.minSizeRes = minsize;
-                DT.mag.minSizeMeasure = minsizemeasure;
-                DT.mag.zoomFactor = zoom;
-                DT.mag.border = border;
-                setItem("DT", DT);
-                $('i#magnifier-submenu-toggle').click();
-            }
-        });
-        $('#magnifier-menu-cancel').click(function() {
-            $("#thingifier-magnifier-menu").fadeToggle(350);
-            $("#magnifier-tooltip").fadeToggle(350);
-        });
-        function measurecheck(measure) {
-            //Should work just as well as an if loop using the || operator
-            switch(measure) {
-                case "vh":
-                case "vw":
-                case "vmin":
-                case "vmax":
-                case "%":
-                case "px":
-                    return true;
-                    break;
-                default:
-                    return false;
-                    break;
-            }
-        }
-
-
-    });//$(document).ready() end
-
-    function getpost(postpath, postid) {
-        let message = "";
-        $.ajax({
-            type: "GET",
-            url: postpath,
-            dataType: "text",
-            timeout: 10000,
-            cache: false
-        })
-            .done(function(data) {
-            quote[postid] = htmlDecode($(data).find('#forum_post_message'));
-            $('#forum_post_message').val(quote[postid]);
-            //Don't use the custom getItem() for these. That's only meant for JSON items
-            var post = localStorage.getItem("quoteid", false);
-            var username = localStorage.getItem("quotename", false);
-            let quoting = "> [**" + username + "** posted:](" + post + ") \n> ";
-            message = htmlDecode(data.replace(/([\u0000-\uffff]+<textarea .+ id="forum_post_message".+>)([\u0000-\uffff]+)(<\/textarea>[\u0000-\uffff]+)/, "$2"));
-            $('#forum_post_message').val(quoting + message);
-        })
-            .fail(function() {
-            console.log("error");
-        });
+      }
     }
 
-    function htmlDecode(input){
-        var e = document.createElement('div');
-        e.innerHTML = input;
-        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    $('i#magnifier-submenu-toggle').click(function () {
+      $('#thingifier-magnifier-menu').fadeToggle(350);
+      $('#magnifier-tooltip').fadeToggle(350);
+      $('#sizenum').val(DT.mag.sizeRes);
+      $('#sizemeasure').val(DT.mag.sizeMeasure);
+      $('#minsizenum').val(DT.mag.minSizeRes);
+      $('#minsizemeasure').val(DT.mag.minSizeMeasure);
+      $('#zoomfactor').val(DT.mag.zoomFactor);
+      if (GM_getValue('magBorder', '50%') === '50%') {
+        $('#circularborder').click();
+      } else {
+        $('#squareborder').click();
+      }
+    });
+    $('#forcircle').click(function () {
+      $('#circularborder').click();
+    });
+    $('#forsquare').click(function () {
+      $('#squareborder').click();
+    });
+    $('#magnifier-menu-submit').click(function () {
+      let ferror = '',
+        border,
+        sizemeasure,
+        minsizemeasure,
+        size,
+        minsize;
+      if ($('#circularborder').is(':checked')) {
+        border = '50%';
+      } else {
+        border = '0';
+      }
+      //Size number
+      if ($('#sizenum').val().toString().match(/\d/g) !== null) {
+        size = $('#sizenum').val();
+      } else {
+        ferror += 'Please use a number for the size!\n';
+      }
+      //Size measurement type
+      if (measurecheck($('#sizemeasure').val())) {
+        sizemeasure = $('#sizemeasure').val();
+      } else {
+        ferror += 'Please use a valid type for the size!\n';
+      }
+      //Minimum size number
+      if ($('#minsizenum').val().toString().match(/\d/g) !== null) {
+        minsize = $('#minsizenum').val();
+      } else {
+        ferror += 'Please use a number for the minimum size!\n';
+      }
+      //Minimum size measurement type
+      if (measurecheck($('#minsizemeasure').val())) {
+        minsizemeasure = $('#minsizemeasure').val();
+      } else {
+        ferror += 'Please use a valid type for the minimum size!\n';
+      }
+      //Zoom factor
+      if ($('#zoomfactor').val().toString().match(/\d/g) !== null) {
+        zoom = $('#zoomfactor').val();
+      } else {
+        ferror += 'Please use a number for the zoomfactor!\n';
+      }
+      //Check for errors or save
+      if (ferror !== '') {
+        alert(ferror);
+      } else {
+        DT.mag.sizeRes = size;
+        DT.mag.sizeMeasure = sizemeasure;
+        DT.mag.minSizeRes = minsize;
+        DT.mag.minSizeMeasure = minsizemeasure;
+        DT.mag.zoomFactor = zoom;
+        DT.mag.border = border;
+        setItem('DT', DT);
+        $('i#magnifier-submenu-toggle').click();
+      }
+    });
+    $('#magnifier-menu-cancel').click(function () {
+      $('#thingifier-magnifier-menu').fadeToggle(350);
+      $('#magnifier-tooltip').fadeToggle(350);
+    });
+    function measurecheck (measure) {
+      //Should work just as well as an if loop using the || operator
+      switch(measure) {
+      case 'vh':
+      case 'vw':
+      case 'vmin':
+      case 'vmax':
+      case '%':
+      case 'px':
+        return true;
+        break;
+      default:
+        return false;
+        break;
+      }
     }
+
+
+  });//$(document).ready() end
+
+  function getpost (postpath, postid) {
+    let message = '';
+    $.ajax({
+      type: 'GET',
+      url: postpath,
+      dataType: 'text',
+      timeout: 10000,
+      cache: false
+    })
+      .done(function (data) {
+        quote[postid] = htmlDecode($(data).find('#forum_post_message'));
+        $('#forum_post_message').val(quote[postid]);
+        //Don't use the custom getItem() for these. That's only meant for JSON items
+        const post = localStorage.getItem('quoteid', false);
+        const username = localStorage.getItem('quotename', false);
+        const quoting = '> [**' + username + '** posted:](' + post + ') \n> ';
+        message = htmlDecode(data.replace(/([\u0000-\uffff]+<textarea .+ id="forum_post_message".+>)([\u0000-\uffff]+)(<\/textarea>[\u0000-\uffff]+)/, '$2'));
+        $('#forum_post_message').val(quoting + message);
+      })
+      .fail(function () {
+        console.log('error');
+      });
+  }
+
+  function htmlDecode (input){
+    const e = document.createElement('div');
+    e.innerHTML = input;
+    return e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue;
+  }
 })();
