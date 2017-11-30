@@ -146,7 +146,6 @@ function getClass(cl) {
         $('body').append(`
 <style>
 #thingifier {
-float: left;
 z-index: 1000 !important;
 max-width: 340px;
 max-height: 255px !important;
@@ -157,29 +156,17 @@ top: 25%;
 position: fixed;
 }
 #thingifier-options {
-border: 1px solid black;
+border: 1px solid rgba(0, 0, 0, 0.2);
 padding: 8px;
-background: aliceblue;
-border-bottom-right-radius: 6px;
+background: white;
+border-radius: 6px;
 border-left-width: 0;
+box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 #thingifier-options ul { list-style-type: none; margin-left: -4px;}
 #thingifier-options ul > li {  vertical-align: middle; }
 #thingifier ul li input { padding-right: 4px; }
 #thingifier-font-size { width: 96px; }
-#thingifier-toggle-button {
-position: absolute;
-top: 0;
-left: calc(100% - 1px);
-width: 24px;
-height: 24px;
-border: 1px solid black;
-background-color: aliceblue;
-color: red;
-border-top-right-radius: 6px;
-border-bottom-right-radius: 6px;
-border-left-width: 0;
-}
 .spoilers-disabled {
 background: #666 none repeat scroll 0% 0%;
 color: #fff;
@@ -407,7 +394,6 @@ cursor: pointer !important;
 <li><input type="button" id="thingifier-clear" value="Clear stored data"></li>
 </ul>
 </div>
-<div id="thingified-toggle"><input type="button" id="thingifier-toggle-button" value="X"></div>
 <i class="thingifier-icon" id="magnifier-submenu-toggle"></i>
 <div id="thingifier-magnifier-menu">
 <h3><i class="thingifier-icon"></i> Magnifier Settings</h3>
@@ -439,6 +425,9 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
 </div>
 
 `);
+        //Add navbar menu item
+        addMenuEntry();
+
         //Define menu option handlers (this must happen before loading config)
         setmenuhandlers();
 
@@ -481,6 +470,17 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
         }
     }
 
+    // Create navbar menu item to open Thingifier options
+    function addMenuEntry () {
+        const divider = document.getElementsByClassName('irc')[0];
+        const menuEntry = document.createElement('li');
+        const menuLink = document.createElement('a');
+        menuLink.text = 'Thingifier';
+        menuLink.id = 'thingifier-toggle-button';
+        menuLink.style.cursor = 'pointer';
+        divider.parentNode.insertBefore(menuEntry, divider).appendChild(menuLink);
+    }
+
 	//Extracts user ID from forum page/posts - by gwennie-chan
 	function getuserid() {
 			var tempUser = $('a[href="/user"] strong').text().trim();
@@ -498,10 +498,10 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
     //Define event handlers for options menu items
     function setmenuhandlers() {
         //Menu close/open
-        $('input#thingifier-toggle-button').click(function() {
+        $('#thingifier-toggle-button').click(function () {
             menuclose("click");
         });
-    
+
         //Unhide spoilers option
         $('#thingifier-unhide-spoilers').change(function() {
             DT.spoilers = $(this).is(":checked");
@@ -619,7 +619,6 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
             //Deal with our current menu state
             menuclose("load");
 
-
             //Check if spoilers are unhidden
             if (DT.spoilers) {
                 $('#thingifier-unhide-spoilers').click();
@@ -669,23 +668,18 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
     function menuclose(sender) {
         //Only runs when loading a page
         if (sender === "load") {
-            //configmenustate = GM_getValue("configmenustate", true); //Load our menu state
-            console.log(configmenustate);
             setTimeout(function() {
                 if (!configmenustate) { //If it's true collapse the menu
-                    $("#thingifier-options").animate({width:'toggle', height:'toggle'},0);
                     $("#magnifier-submenu-toggle").fadeToggle(0);
-                    menubutton();
                 }
                 $("#thingifier-magnifier-menu").fadeToggle(0);
                 $("#magnifier-tooltip").fadeToggle(0);
-                $("#thingifier").css("display", "initial");
             }, 100);
 
             //Runs when clicking the button
         } else if (sender === "click") {
             configmenustate = !!configmenustate ? false : true; //XOR our menu state, can also use ^=
-            $("#thingifier-options").animate({width:'toggle', height:'toggle'},350); //Toggle the menu
+            document.getElementById('thingifier').style.display = configmenustate ? 'initial' : 'none';
             if ($('#thingifier-magnifier-menu').is( ":visible" )) {
                 $('#thingifier-magnifier-menu').fadeToggle(0);
                 $('#magnifier-tooltip').fadeToggle(0);
@@ -695,15 +689,6 @@ Shape: <input type="radio" id="squareborder" val="square" name="magnifier-shape"
             } else {
                 $("#magnifier-submenu-toggle").fadeToggle(500);
             }
-            menubutton();
-        }
-    }
-    function menubutton() {
-        //Controls the button's icon
-        if (!configmenustate) {
-            $('#thingifier-toggle-button').val('▶');
-        } else {
-            $('#thingifier-toggle-button').val('◀');
         }
     }
 
